@@ -1,0 +1,20 @@
+apiVersion: v1
+entries:
+  kuvik-operator:
+  - apiVersion: v2
+    appVersion: 0.6.1
+    created: "2026-05-17T21:39:16.399884+02:00"
+    description: Kuvik Operator — deployed on workload clusters to register services
+      with the LB cluster via gRPC
+    digest: 6d70c291371f07e28022fe7f10421b1e4300c2b474b3fd7a5ba6ea5f8e8a72b6
+    home: https://github.com/kuvik-io/lb-cluster
+    keywords:
+    - kubernetes
+    - load-balancer
+    - kuvik
+    name: kuvik-operator
+    type: application
+    urls:
+    - https://kuvik-io.github.io/kuvik-adc/kuvik-operator-0.6.1.tgz
+    version: 0.6.1
+generated: "2026-05-17T21:39:16.398805+02:00"
