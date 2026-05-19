@@ -4,16 +4,16 @@ Public distribution repository for **Kuvik ADC** (Application Delivery Controlle
 
 This repository holds **user-facing release artifacts** for the workload-cluster operator. Helm charts and container images are published to GitHub Container Registry; binary tarballs are attached to GitHub Releases for airgap installs. Source code lives in private repositories.
 
-## Latest release: v0.11.8
+## Latest release: v0.11.9
 
 | Artifact | Reference |
 |---|---|
-| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:0.11.8` (also `:latest`) |
-| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:0.11.8` |
-| Chart tarball | [kuvik-operator-0.11.8.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.8/kuvik-operator-0.11.8.tgz) |
-| Image tarball (airgap) | [kuvik-operator-image-0.11.8.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.8/kuvik-operator-image-0.11.8.tar.gz) |
+| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:0.11.9` (also `:latest`) |
+| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:0.11.9` |
+| Chart tarball | [kuvik-operator-0.11.9.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.9/kuvik-operator-0.11.9.tgz) |
+| Image tarball (airgap) | [kuvik-operator-image-0.11.9.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.9/kuvik-operator-image-0.11.9.tar.gz) |
 
-Full release notes: [v0.11.8](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v0.11.8). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
+Full release notes: [v0.11.9](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v0.11.9). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
 
 ## What is this?
 
@@ -28,8 +28,8 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml   # or your kubeconfig path
 
 helm upgrade --install kuvik-operator \
   oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
-  --version 0.11.8 \
-  --namespace kuvik-system --create-namespace \
+  --version 0.11.9 \
+  --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
   --set site=<site-label> \
@@ -47,9 +47,9 @@ Works without any registry access — download both tarballs from this release a
 
 ```bash
 curl -fLo /tmp/op.tgz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.8/kuvik-operator-0.11.8.tgz
+  https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.9/kuvik-operator-0.11.9.tgz
 curl -fLo /tmp/img.tar.gz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.8/kuvik-operator-image-0.11.8.tar.gz
+  https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.11.9/kuvik-operator-image-0.11.9.tar.gz
 
 # Load image into local containerd (k3s)
 gunzip -c /tmp/img.tar.gz | sudo k3s ctr images import -
@@ -57,7 +57,7 @@ gunzip -c /tmp/img.tar.gz | sudo k3s ctr images import -
 # Install from tarball
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 helm upgrade --install kuvik-operator /tmp/op.tgz \
-  --namespace kuvik-system --create-namespace \
+  --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
   --set site=<site-label> \
@@ -70,13 +70,13 @@ For a private mirror, retag the image and override `image.repository` / `image.t
 ## Uninstall
 
 ```bash
-helm uninstall kuvik-operator --namespace kuvik-system
+helm uninstall kuvik-operator --namespace kuvik-operator-system
 ```
 
 The chart ships a Helm `pre-delete` hook that calls `FullSync(empty)` against the controller so all LBService records for this cluster are removed automatically. If the controller is unreachable, the hook times out after 60 seconds and uninstall proceeds; orphaned records can be cleaned up from the Management UI. To skip the graceful deregister entirely:
 
 ```bash
-helm uninstall kuvik-operator --namespace kuvik-system --no-hooks
+helm uninstall kuvik-operator --namespace kuvik-operator-system --no-hooks
 ```
 
 ## Compatibility
