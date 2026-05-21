@@ -1,5 +1,13 @@
 # Kuvik ADC Changelog
 
+## v0.11.60 — 2026-05-21
+
+- Image: `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:0.11.60`
+- Chart: `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:0.11.60`
+- Release: https://github.com/Kuvik-io/kuvik-adc/releases/tag/v0.11.60
+- LB cluster build: kuvik-lb-cluster commit `688e73f`
+
+
 ## v0.11.57 — 2026-05-21
 
 - Image: `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:0.11.57`
