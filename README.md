@@ -21,11 +21,31 @@ The **Kuvik Operator** runs on a workload Kubernetes cluster and registers `Load
 
 The Kuvik LB control plane is a separate product — what this operator talks to. See the Kuvik LB Management UI's **Clusters → Add Workload Cluster** wizard for the values to plug into the install command below.
 
+## Prerequisites
+
+### Gateway API CRDs (required)
+
+The operator installs a `GatewayClass` resource by default (`gatewayAPI.enabled: true`). Gateway API CRDs are **not** bundled with Kubernetes or k3s — install them once per cluster before running Helm:
+
+```bash
+# Standard channel — HTTPRoute, Gateway, GatewayClass, ReferenceGrant
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+
+# Optional: experimental channel adds TCPRoute, TLSRoute, GRPCRoute, UDPRoute
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml
+```
+
+To opt out, pass `--set gatewayAPI.enabled=false` to the Helm install command.
+
 ## Install (online — recommended)
 
 ```bash
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml   # or your kubeconfig path
 
+# 1. Install Gateway API CRDs (skip if already installed)
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+
+# 2. Install the operator
 helm upgrade --install kuvik-operator \
   oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
   --version 0.13.80 \
@@ -53,6 +73,9 @@ curl -fLo /tmp/img.tar.gz \
 
 # Load image into local containerd (k3s)
 gunzip -c /tmp/img.tar.gz | sudo k3s ctr images import -
+
+# Install Gateway API CRDs (skip if already installed)
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
 
 # Install from tarball
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
