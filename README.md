@@ -4,16 +4,16 @@ Public distribution repository for **Kuvik ADC** (Application Delivery Controlle
 
 This repository holds **user-facing release artifacts** for the workload-cluster operator. Helm charts and container images are published to GitHub Container Registry; binary tarballs are attached to GitHub Releases for airgap installs. Source code lives in private repositories.
 
-## Latest release: v0.13.80
+## Latest release: v1.0.1
 
 | Artifact | Reference |
 |---|---|
-| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:0.13.80` (also `:latest`) |
-| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:0.13.80` |
-| Chart tarball | [kuvik-operator-0.13.80.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.13.80/kuvik-operator-0.13.80.tgz) |
-| Image tarball (airgap) | [kuvik-operator-image-0.13.80.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.13.80/kuvik-operator-image-0.13.80.tar.gz) |
+| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.1` (also `:latest`) |
+| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.1` |
+| Chart tarball | [kuvik-operator-1.0.1.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.1/kuvik-operator-1.0.1.tgz) |
+| Image tarball (airgap) | [kuvik-operator-image-1.0.1.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.1/kuvik-operator-image-1.0.1.tar.gz) |
 
-Full release notes: [v0.13.80](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v0.13.80). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
+Full release notes: [v1.0.1](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.1). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
 
 ## What is this?
 
@@ -48,7 +48,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 # 2. Install the operator
 helm upgrade --install kuvik-operator \
   oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
-  --version 0.13.80 \
+  --version 1.0.1 \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -67,9 +67,9 @@ Works without any registry access — download both tarballs from this release a
 
 ```bash
 curl -fLo /tmp/op.tgz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.13.80/kuvik-operator-0.13.80.tgz
+  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.1/kuvik-operator-1.0.1.tgz
 curl -fLo /tmp/img.tar.gz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v0.13.80/kuvik-operator-image-0.13.80.tar.gz
+  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.1/kuvik-operator-image-1.0.1.tar.gz
 
 # Load image into local containerd (k3s)
 gunzip -c /tmp/img.tar.gz | sudo k3s ctr images import -
