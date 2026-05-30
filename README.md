@@ -4,16 +4,16 @@ Public distribution repository for **Kuvik ADC** (Application Delivery Controlle
 
 This repository holds **user-facing release artifacts** for the workload-cluster operator. Helm charts and container images are published to GitHub Container Registry; binary tarballs are attached to GitHub Releases for airgap installs. Source code lives in private repositories.
 
-## Latest release: v1.0.3
+## Latest release: v1.0.4
 
 | Artifact | Reference |
 |---|---|
-| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.3` (also `:latest`) |
-| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.3` |
-| Chart tarball | [kuvik-operator-1.0.3.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.3/kuvik-operator-1.0.3.tgz) |
-| Image tarball (airgap) | [kuvik-operator-image-1.0.3.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.3/kuvik-operator-image-1.0.3.tar.gz) |
+| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.4` (also `:latest`) |
+| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.4` |
+| Chart tarball | [kuvik-operator-1.0.4.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.4/kuvik-operator-1.0.4.tgz) |
+| Image tarball (airgap) | [kuvik-operator-image-1.0.4.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.4/kuvik-operator-image-1.0.4.tar.gz) |
 
-Full release notes: [v1.0.3](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.3). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
+Full release notes: [v1.0.4](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.4). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
 
 ## What is this?
 
@@ -24,11 +24,11 @@ The Kuvik LB control plane is a separate product — what this operator talks to
 ## Install (online — recommended)
 
 ```bash
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml   # or your kubeconfig path
+export KUBECONFIG=<your_kubeconfig>
 
 helm upgrade --install kuvik-operator \
   oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
-  --version 1.0.3 \
+  --version 1.0.4 \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -37,7 +37,7 @@ helm upgrade --install kuvik-operator \
   --set-string grpc.caCert="<base64-CA-from-UI>"
 ```
 
-No cluster-level prerequisites — the chart installs cleanly on any Kubernetes 1.27+ or k3s cluster. Gateway API support is opt-in (see [Optional: Gateway API support](#optional-gateway-api-support) below).
+No cluster-level prerequisites — the chart installs cleanly on any Kubernetes 1.27+ cluster. Gateway API support is opt-in (see [Optional: Gateway API support](#optional-gateway-api-support) below).
 
 `controllerGRPCAddress`, `clusterID`, `site`, `grpc.operatorRegistrationToken`, `grpc.caCert` are emitted by the Kuvik LB Management UI's **Add Workload Cluster** wizard — copy them from there.
 
@@ -49,15 +49,18 @@ Works without any registry access — download both tarballs from this release a
 
 ```bash
 curl -fLo /tmp/op.tgz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.3/kuvik-operator-1.0.3.tgz
+  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.4/kuvik-operator-1.0.4.tgz
 curl -fLo /tmp/img.tar.gz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.3/kuvik-operator-image-1.0.3.tar.gz
+  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.4/kuvik-operator-image-1.0.4.tar.gz
 
-# Load image into local containerd (k3s)
-gunzip -c /tmp/img.tar.gz | sudo k3s ctr images import -
+# Import image into your container runtime's local image store.
+# Pick the command matching your runtime — examples:
+#   sudo ctr -n=k8s.io images import /tmp/img.tar.gz   # containerd
+#   docker load < <(gunzip -c /tmp/img.tar.gz)         # docker
+gunzip -c /tmp/img.tar.gz | sudo ctr -n=k8s.io images import -
 
 # Install from tarball
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+export KUBECONFIG=<your_kubeconfig>
 helm upgrade --install kuvik-operator /tmp/op.tgz \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
@@ -80,7 +83,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 # 2. Re-run the operator helm upgrade with the flag set
 helm upgrade --install kuvik-operator \
   oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
-  --version 1.0.3 \
+  --version 1.0.4 \
   --namespace kuvik-operator-system --reuse-values \
   --set gatewayAPI.enabled=true
 ```
