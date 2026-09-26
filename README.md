@@ -2,33 +2,31 @@
 
 Public distribution repository for **Kuvik ADC** (Application Delivery Controller).
 
-This repository holds **user-facing release artifacts** for the workload-cluster operator. Helm charts and container images are published to GitHub Container Registry; binary tarballs are attached to GitHub Releases for airgap installs. Source code lives in private repositories.
+This repository holds **user-facing release artifacts** for the workload-cluster operator. Helm charts and container images are published to GitHub Container Registry; the chart, the image archive and their checksums are attached to GitHub Releases for air-gapped installs. Source code lives in private repositories.
 
-## Latest release: v1.0.512
+## Latest release: v1.0.529
 
 | Artifact | Reference |
 |---|---|
-| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.512` (also `:latest`) |
-| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.512` |
-| Chart tarball | [kuvik-operator-1.0.512.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.512/kuvik-operator-1.0.512.tgz) |
-| Image tarball (airgap) | [kuvik-operator-image-1.0.512.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.512/kuvik-operator-image-1.0.512.tar.gz) |
+| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.529` (also `:latest`) — config digest `sha256:3b00ade78de9582486441b9305b1d304f356b1ebd300962383e27f9116192929` |
+| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.529` |
+| Chart tarball | [kuvik-operator-1.0.529.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.529/kuvik-operator-1.0.529.tgz) |
+| Image archive | [kuvik-operator-image-1.0.529.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.529/kuvik-operator-image-1.0.529.tar.gz) |
+| Checksums | [SHA256SUMS](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.529/SHA256SUMS) |
 
-Full release notes: [v1.0.512](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.512). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
+Full release notes: [v1.0.529](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.529). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
 
 ## What is this?
 
 The **Kuvik Operator** runs on a workload Kubernetes cluster and registers `LoadBalancer`-type Services with a Kuvik LB control plane via gRPC. One operator per workload cluster. The Kuvik LB control plane allocates a VIP, provisions an LB Pod, and announces the route — without changing your application's Service manifest.
 
-The Kuvik LB control plane is a separate product — what this operator talks to. See the Kuvik LB Management UI's **Clusters → Add Workload Cluster** wizard for the values to plug into the install command below.
+The operator is published only when it changes, so the latest release here is the one to install alongside any later Kuvik LB release.
 
-## Install (online — recommended)
+## Install (online)
 
 ```bash
-export KUBECONFIG=<your_kubeconfig>
-
 helm upgrade --install kuvik-operator \
-  oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
-  --version 1.0.512 \
+  oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator --version 1.0.529 \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -37,31 +35,68 @@ helm upgrade --install kuvik-operator \
   --set-string grpc.caCert="<base64-CA-from-UI>"
 ```
 
-No cluster-level prerequisites — the chart installs cleanly on any Kubernetes 1.27+ cluster. Gateway API support is opt-in (see [Optional: Gateway API support](#optional-gateway-api-support) below).
+`controllerGRPCAddress`, `clusterID`, `site`, `grpc.operatorRegistrationToken` and `grpc.caCert` come from the Kuvik LB Management UI's **Add Workload Cluster** wizard.
 
-`controllerGRPCAddress`, `clusterID`, `site`, `grpc.operatorRegistrationToken`, `grpc.caCert` are emitted by the Kuvik LB Management UI's **Add Workload Cluster** wizard — copy them from there.
+## Install (air-gapped)
 
-If the operator runs in the same Kubernetes cluster as the controller, use `kuvik-controller-kuvik-controller-manager.kuvik-system.svc:19000` as the dial target instead of a VIP. (That is the release-name-derived Service; `kuvik-controller` alone is not a Service this chart renders.)
-
-## Install (airgap / offline)
-
-Works without any registry access — download both tarballs from this release and import locally.
+Download the three release assets on a connected machine and verify them before carrying them in:
 
 ```bash
-curl -fLo /tmp/op.tgz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.512/kuvik-operator-1.0.512.tgz
-curl -fLo /tmp/img.tar.gz \
-  https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.512/kuvik-operator-image-1.0.512.tar.gz
+curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.529/kuvik-operator-1.0.529.tgz
+curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.529/kuvik-operator-image-1.0.529.tar.gz
+curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.529/SHA256SUMS
+sha256sum -c SHA256SUMS        # both lines must end in OK
+gunzip -k kuvik-operator-image-1.0.529.tar.gz                      # -> kuvik-operator-image-1.0.529.tar
+```
 
-# Import image into your container runtime's local image store.
-# Pick the command matching your runtime — examples:
-#   sudo ctr -n=k8s.io images import /tmp/img.tar.gz   # containerd
-#   docker load < <(gunzip -c /tmp/img.tar.gz)         # docker
-gunzip -c /tmp/img.tar.gz | sudo ctr -n=k8s.io images import -
+The image's identity is its **config digest**, `sha256:3b00ade78de9582486441b9305b1d304f356b1ebd300962383e27f9116192929`. It is the same in every registry the image is copied to; the manifest digest is not.
 
-# Install from tarball
-export KUBECONFIG=<your_kubeconfig>
-helm upgrade --install kuvik-operator /tmp/op.tgz \
+### Path 1 — your own registry (recommended)
+
+```bash
+REG=registry.example.internal/kuvik          # your registry and project
+
+# Image: pick one
+crane push kuvik-operator-image-1.0.529.tar ${REG}/kuvik-operator:1.0.529
+#   or: skopeo copy docker-archive:kuvik-operator-image-1.0.529.tar docker://${REG}/kuvik-operator:1.0.529
+#   or: docker load -i kuvik-operator-image-1.0.529.tar
+#       docker tag ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.529 ${REG}/kuvik-operator:1.0.529
+#       docker push ${REG}/kuvik-operator:1.0.529
+
+# Verify: must print 3b00ade78de9582486441b9305b1d304f356b1ebd300962383e27f9116192929
+crane config ${REG}/kuvik-operator:1.0.529 | sha256sum
+#   or: skopeo inspect --raw --config docker://${REG}/kuvik-operator:1.0.529 | sha256sum
+
+# Chart: push it next to the image (or install straight from kuvik-operator-1.0.529.tgz below)
+helm push kuvik-operator-1.0.529.tgz oci://${REG}/charts
+
+# Registry credentials for the pods, if your registry needs them
+kubectl create namespace kuvik-operator-system
+kubectl -n kuvik-operator-system create secret docker-registry kuvik-regcred \
+  --docker-server=<registry host> --docker-username=<user> --docker-password=<password>
+
+helm upgrade --install kuvik-operator oci://${REG}/charts/kuvik-operator --version 1.0.529 \
+  --namespace kuvik-operator-system --create-namespace \
+  --set image.repository=${REG}/kuvik-operator \
+  --set image.tag=1.0.529 \
+  --set 'imagePullSecrets[0].name=kuvik-regcred' \
+  --set controllerGRPCAddress=<LB-VIP>:19000 \
+  --set clusterID=<your-cluster-id> \
+  --set site=<site-label> \
+  --set grpc.operatorRegistrationToken=<token-from-UI> \
+  --set-string grpc.caCert="<base64-CA-from-UI>"
+```
+
+`imagePullSecrets` reaches both pods the chart runs — the operator and the pre-delete deregister Job. Leave it out if your registry allows anonymous pulls.
+
+### Path 2 — import on every node (no registry)
+
+The chart's default image is `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.529` with `imagePullPolicy: IfNotPresent`, and the archive carries exactly that name. Import it on **every node** the operator or its deregister Job can be scheduled on:
+
+```bash
+sudo ctr -n k8s.io images import kuvik-operator-image-1.0.529.tar      # k3s: sudo k3s ctr -n k8s.io images import …
+
+helm upgrade --install kuvik-operator ./kuvik-operator-1.0.529.tgz \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -70,25 +105,15 @@ helm upgrade --install kuvik-operator /tmp/op.tgz \
   --set-string grpc.caCert="<base64-CA-from-UI>"
 ```
 
-For a private mirror, retag the image and override `image.repository` / `image.tag` accordingly.
+A node without the image tries to pull from ghcr.io and stays in `ErrImagePull` — prefer Path 1.
 
 ## Optional: Gateway API support
 
-The operator can manage [Gateway API](https://gateway-api.sigs.k8s.io/) resources (`GatewayClass`/`Gateway`/`HTTPRoute`) in addition to plain LoadBalancer-type Services. Disabled by default — opt in only if your workloads use Gateway API.
+The chart skips the `GatewayClass` when the Gateway API CRDs are absent, and the operator then runs in Service-only mode. To use Gateway API, install the upstream CRDs once and re-run the `helm upgrade` above:
 
 ```bash
-# 1. Install Gateway API CRDs (one-time, cluster-wide)
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
-
-# 2. Re-run the operator helm upgrade with the flag set
-helm upgrade --install kuvik-operator \
-  oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator \
-  --version 1.0.512 \
-  --namespace kuvik-operator-system --reuse-values \
-  --set gatewayAPI.enabled=true
 ```
-
-The chart auto-skips the `GatewayClass` resource when the Gateway API CRDs are absent, and the operator binary auto-skips the Gateway controller — so leaving `gatewayAPI.enabled=true` on a cluster without Gateway API CRDs installs cleanly and runs in Service-only mode.
 
 ## Uninstall
 
@@ -96,19 +121,7 @@ The chart auto-skips the `GatewayClass` resource when the Gateway API CRDs are a
 helm uninstall kuvik-operator --namespace kuvik-operator-system
 ```
 
-The chart ships a Helm `pre-delete` hook that calls `FullSync(empty)` against the controller so all LBService records for this cluster are removed automatically. If the controller is unreachable, the hook times out after 60 seconds and uninstall proceeds; orphaned records can be cleaned up from the Management UI. To skip the graceful deregister entirely:
-
-```bash
-helm uninstall kuvik-operator --namespace kuvik-operator-system --no-hooks
-```
-
-## Compatibility
-
-| Operator version | Kuvik LB control plane |
-|---|---|
-| 0.11.x | 0.10.x, 0.11.x |
-
-v0.11.0 was a breaking minor on the LB-cluster side (file-path gRPC TLS removed). The operator itself has no breaking changes.
+A `pre-delete` hook deregisters this cluster's services from the controller (`FullSync(empty)`); if the controller is unreachable it gives up after 60 seconds and the uninstall proceeds. `--no-hooks` skips it.
 
 ## License & trademarks
 
