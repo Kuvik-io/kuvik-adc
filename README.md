@@ -115,6 +115,19 @@ The chart skips the `GatewayClass` when the Gateway API CRDs are absent, and the
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
 ```
 
+## Upgrading
+
+Upgrade the **Kuvik ADC (the LB cluster) first, then the operator** on each workload cluster:
+
+```bash
+helm upgrade kuvik-operator oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator --version 1.0.530 \
+  --namespace kuvik-operator-system --reset-then-reuse-values --wait
+```
+
+- Use `--reset-then-reuse-values` (Helm 3.14 or newer). `--reuse-values` also keeps the previous chart's default image tag, so the upgrade "succeeds" onto the old image.
+- Either order keeps traffic flowing: a newer ADC handles an older operator's reports with the rules it used before, and an older ADC ignores the fields a newer operator adds. Features that need both sides — per-namespace TLS certificate references, the trust report the CA-rotation gate reads — take effect only once both are upgraded.
+- Until a workload cluster's operator is upgraded, the ADC treats that cluster's CA trust as unverified and refuses a cross-signed CA rotation by default.
+
 ## Uninstall
 
 ```bash
