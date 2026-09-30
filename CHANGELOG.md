@@ -1,5 +1,23 @@
 # Kuvik ADC Changelog
 
+## v1.0.531 — 2026-09-30
+
+- Image: `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.531` (config `sha256:a3c7764238335f94c8aadce1fb6ae83f1c10d4bd3b4005740ccc1c17ff736c31`)
+- Chart: `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.531`
+- Release: https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.531
+- LB cluster build: kuvik-lb-cluster commit `4eb05c37f0b3`
+
+#### Behaviour changes
+
+- **ListenerSet `certificateRefs` without a namespace now resolve in the ListenerSet's own namespace** (Gateway API spec: "When unspecified, the local namespace is inferred"). Earlier operators resolved them in the parent Gateway's namespace. Set `namespace:` explicitly to keep referencing the Gateway's namespace — a ReferenceGrant is still required for a cross-namespace reference.
+
+#### Fixes
+
+- A Gateway's backend Service port is matched on (port, protocol), not on the port number alone, so a Service that exposes the same number over TCP and UDP resolves the right NodePort.
+- ReferenceGrant verdicts are carried per reference (per listener slot), not per Secret, so one grant no longer admits or refuses another referrer's use of the same Secret.
+- BackendPool names for a Gateway bundle are decided once by the operator; only colliding pools get identity-derived names, so two Gateways whose names fold to the same pool no longer share one.
+
+
 ## v1.0.530 — 2026-09-29
 
 - Image: `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.530` (config `sha256:773a5b403a117cde7e506994091a2a56314058231c5947824d7e2dc4e60fe882`)
