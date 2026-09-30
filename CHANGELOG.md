@@ -1,5 +1,18 @@
 # Kuvik ADC Changelog
 
+## v1.0.532 — 2026-09-30
+
+- Image: `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.532` (config `sha256:a186a81b9c20959c451f8f84997ede9d520270278473b5f82229823e14038997`)
+- Chart: `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.532`
+- Release: https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.532
+- LB cluster build: kuvik-lb-cluster commit `3780977dcd9f`
+
+#### Behaviour changes
+
+- **The operator now verifies the LB cluster's controller by its URI identity, not by host name — and needs LB cluster 1.0.530 or newer.** The operator requires the controller's gRPC certificate to chain to the pinned CA **and** carry the URI SAN `kuvik://controller/grpc-server`. There is no fallback to a DNS name: a certificate that only names `kuvik-controller.<ns>.svc` is refused, because the LB cluster's CA signs DNS names that an operator-role REST user chooses, so a matching name is not proof of being the controller. LB clusters from 1.0.530 present the URI; against an older LB cluster the operator cannot connect (the log line says the certificate carries no `kuvik://controller/grpc-server` URI SAN). **Upgrade the LB cluster first, then the operators.** `grpc.serverName` remains a chart value but is now sent as SNI only. The CA-handover behaviour of `grpc.trustIssuedCAOnPinFailure` is unchanged: it still arms only on a genuine "unknown authority", never on a URI mismatch.
+- **The registration token is no longer passed as a command-line argument.** The chart stores `grpc.operatorRegistrationToken` in a Secret (`<release>-registration-token`) and gives the operator and the pre-delete Job the environment variable `KUVIK_GRPC_OPERATOR_REGISTRATION_TOKEN` from it (`secretKeyRef`). Before, anyone who could read the Deployment or Pod in the workload cluster, and `ps` on the node, could read the token. Existing installations: upgrade with `helm upgrade --reset-then-reuse-values` (the stored `grpc.operatorRegistrationToken` is kept and the Secret is created; you do not need to type the token again). The `--grpc-operator-registration-token` flag is still accepted for one release for hand-written manifests; the chart no longer sets it. If the token was ever visible in a Pod spec, regenerate it in the Management UI (Settings, Operator Registration) and set the new value on upgrade.
+
+
 ## v1.0.531 — 2026-09-30
 
 - Image: `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.531` (config `sha256:a3c7764238335f94c8aadce1fb6ae83f1c10d4bd3b4005740ccc1c17ff736c31`)
