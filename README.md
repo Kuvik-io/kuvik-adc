@@ -4,17 +4,17 @@ Public distribution repository for **Kuvik ADC** (Application Delivery Controlle
 
 This repository holds **user-facing release artifacts** for the workload-cluster operator. Helm charts and container images are published to GitHub Container Registry; the chart, the image archive and their checksums are attached to GitHub Releases for air-gapped installs. Source code lives in private repositories.
 
-## Latest release: v1.0.532
+## Latest release: v1.1.0
 
 | Artifact | Reference |
 |---|---|
-| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.532` (also `:latest`) — config digest `sha256:a186a81b9c20959c451f8f84997ede9d520270278473b5f82229823e14038997` |
-| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.0.532` |
-| Chart tarball | [kuvik-operator-1.0.532.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.532/kuvik-operator-1.0.532.tgz) |
-| Image archive | [kuvik-operator-image-1.0.532.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.532/kuvik-operator-image-1.0.532.tar.gz) |
-| Checksums | [SHA256SUMS](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.532/SHA256SUMS) |
+| Container image | `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.1.0` (also `:latest`) — config digest `sha256:69cff258da3839d1fbacab2fe3fdf98af7250e1bc68fa24f0c08935b260fdfcd` |
+| Helm chart (OCI) | `oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator:1.1.0` |
+| Chart tarball | [kuvik-operator-1.1.0.tgz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.1.0/kuvik-operator-1.1.0.tgz) |
+| Image archive | [kuvik-operator-image-1.1.0.tar.gz](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.1.0/kuvik-operator-image-1.1.0.tar.gz) |
+| Checksums | [SHA256SUMS](https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.1.0/SHA256SUMS) |
 
-Full release notes: [v1.0.532](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.0.532). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
+Full release notes: [v1.1.0](https://github.com/Kuvik-io/kuvik-adc/releases/tag/v1.1.0). Earlier versions: [all releases](https://github.com/Kuvik-io/kuvik-adc/releases).
 
 ## What is this?
 
@@ -26,7 +26,7 @@ The operator is published only when it changes, so the latest release here is th
 
 ```bash
 helm upgrade --install kuvik-operator \
-  oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator --version 1.0.532 \
+  oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator --version 1.1.0 \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -42,14 +42,14 @@ helm upgrade --install kuvik-operator \
 Download the three release assets on a connected machine and verify them before carrying them in:
 
 ```bash
-curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.532/kuvik-operator-1.0.532.tgz
-curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.532/kuvik-operator-image-1.0.532.tar.gz
-curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.0.532/SHA256SUMS
+curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.1.0/kuvik-operator-1.1.0.tgz
+curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.1.0/kuvik-operator-image-1.1.0.tar.gz
+curl -fLO https://github.com/Kuvik-io/kuvik-adc/releases/download/v1.1.0/SHA256SUMS
 sha256sum -c SHA256SUMS        # both lines must end in OK
-gunzip -k kuvik-operator-image-1.0.532.tar.gz                      # -> kuvik-operator-image-1.0.532.tar
+gunzip -k kuvik-operator-image-1.1.0.tar.gz                      # -> kuvik-operator-image-1.1.0.tar
 ```
 
-The image's identity is its **config digest**, `sha256:a186a81b9c20959c451f8f84997ede9d520270278473b5f82229823e14038997`. It is the same in every registry the image is copied to; the manifest digest is not.
+The image's identity is its **config digest**, `sha256:69cff258da3839d1fbacab2fe3fdf98af7250e1bc68fa24f0c08935b260fdfcd`. It is the same in every registry the image is copied to; the manifest digest is not.
 
 ### Path 1 — your own registry (recommended)
 
@@ -57,28 +57,28 @@ The image's identity is its **config digest**, `sha256:a186a81b9c20959c451f8f849
 REG=registry.example.internal/kuvik          # your registry and project
 
 # Image: pick one
-crane push kuvik-operator-image-1.0.532.tar ${REG}/kuvik-operator:1.0.532
-#   or: skopeo copy docker-archive:kuvik-operator-image-1.0.532.tar docker://${REG}/kuvik-operator:1.0.532
-#   or: docker load -i kuvik-operator-image-1.0.532.tar
-#       docker tag ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.532 ${REG}/kuvik-operator:1.0.532
-#       docker push ${REG}/kuvik-operator:1.0.532
+crane push kuvik-operator-image-1.1.0.tar ${REG}/kuvik-operator:1.1.0
+#   or: skopeo copy docker-archive:kuvik-operator-image-1.1.0.tar docker://${REG}/kuvik-operator:1.1.0
+#   or: docker load -i kuvik-operator-image-1.1.0.tar
+#       docker tag ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.1.0 ${REG}/kuvik-operator:1.1.0
+#       docker push ${REG}/kuvik-operator:1.1.0
 
-# Verify: must print a186a81b9c20959c451f8f84997ede9d520270278473b5f82229823e14038997
-crane config ${REG}/kuvik-operator:1.0.532 | sha256sum
-#   or: skopeo inspect --raw --config docker://${REG}/kuvik-operator:1.0.532 | sha256sum
+# Verify: must print 69cff258da3839d1fbacab2fe3fdf98af7250e1bc68fa24f0c08935b260fdfcd
+crane config ${REG}/kuvik-operator:1.1.0 | sha256sum
+#   or: skopeo inspect --raw --config docker://${REG}/kuvik-operator:1.1.0 | sha256sum
 
-# Chart: push it next to the image (or install straight from kuvik-operator-1.0.532.tgz below)
-helm push kuvik-operator-1.0.532.tgz oci://${REG}/charts
+# Chart: push it next to the image (or install straight from kuvik-operator-1.1.0.tgz below)
+helm push kuvik-operator-1.1.0.tgz oci://${REG}/charts
 
 # Registry credentials for the pods, if your registry needs them
 kubectl create namespace kuvik-operator-system
 kubectl -n kuvik-operator-system create secret docker-registry kuvik-regcred \
   --docker-server=<registry host> --docker-username=<user> --docker-password=<password>
 
-helm upgrade --install kuvik-operator oci://${REG}/charts/kuvik-operator --version 1.0.532 \
+helm upgrade --install kuvik-operator oci://${REG}/charts/kuvik-operator --version 1.1.0 \
   --namespace kuvik-operator-system --create-namespace \
   --set image.repository=${REG}/kuvik-operator \
-  --set image.tag=1.0.532 \
+  --set image.tag=1.1.0 \
   --set 'imagePullSecrets[0].name=kuvik-regcred' \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -91,12 +91,12 @@ helm upgrade --install kuvik-operator oci://${REG}/charts/kuvik-operator --versi
 
 ### Path 2 — import on every node (no registry)
 
-The chart's default image is `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.0.532` with `imagePullPolicy: IfNotPresent`, and the archive carries exactly that name. Import it on **every node** the operator or its deregister Job can be scheduled on:
+The chart's default image is `ghcr.io/kuvik-io/kuvik-adc/kuvik-operator:1.1.0` with `imagePullPolicy: IfNotPresent`, and the archive carries exactly that name. Import it on **every node** the operator or its deregister Job can be scheduled on:
 
 ```bash
-sudo ctr -n k8s.io images import kuvik-operator-image-1.0.532.tar      # k3s: sudo k3s ctr -n k8s.io images import …
+sudo ctr -n k8s.io images import kuvik-operator-image-1.1.0.tar      # k3s: sudo k3s ctr -n k8s.io images import …
 
-helm upgrade --install kuvik-operator ./kuvik-operator-1.0.532.tgz \
+helm upgrade --install kuvik-operator ./kuvik-operator-1.1.0.tgz \
   --namespace kuvik-operator-system --create-namespace \
   --set controllerGRPCAddress=<LB-VIP>:19000 \
   --set clusterID=<your-cluster-id> \
@@ -120,7 +120,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 Upgrade the **Kuvik ADC (the LB cluster) first, then the operator** on each workload cluster:
 
 ```bash
-helm upgrade kuvik-operator oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator --version 1.0.532 \
+helm upgrade kuvik-operator oci://ghcr.io/kuvik-io/kuvik-adc/charts/kuvik-operator --version 1.1.0 \
   --namespace kuvik-operator-system --reset-then-reuse-values --wait
 ```
 
